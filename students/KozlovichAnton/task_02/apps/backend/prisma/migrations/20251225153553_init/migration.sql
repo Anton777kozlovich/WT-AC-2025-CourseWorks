@@ -1,22 +1,10 @@
--- CreateEnum
-CREATE TYPE "Role" AS ENUM ('admin', 'manager', 'developer', 'user');
-
--- CreateEnum
-CREATE TYPE "ProjectMemberRole" AS ENUM ('owner', 'manager', 'developer', 'viewer');
-
--- CreateEnum
-CREATE TYPE "BugStatus" AS ENUM ('new', 'in_progress', 'testing', 'done', 'closed');
-
--- CreateEnum
-CREATE TYPE "BugPriority" AS ENUM ('low', 'medium', 'high', 'critical');
-
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'user',
+    "role" TEXT NOT NULL DEFAULT 'user' CHECK ("role" IN ('admin', 'manager', 'developer', 'user')),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -40,7 +28,7 @@ CREATE TABLE "ProjectMember" (
     "id" TEXT NOT NULL,
     "projectId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "role" "ProjectMemberRole" NOT NULL,
+    "role" TEXT NOT NULL CHECK ("role" IN ('owner', 'manager', 'developer', 'viewer')),
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "ProjectMember_pkey" PRIMARY KEY ("id")
@@ -52,8 +40,8 @@ CREATE TABLE "Bug" (
     "projectId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "status" "BugStatus" NOT NULL DEFAULT 'new',
-    "priority" "BugPriority" NOT NULL DEFAULT 'medium',
+    "status" TEXT NOT NULL DEFAULT 'new' CHECK ("status" IN ('new', 'in_progress', 'testing', 'done', 'closed')),
+    "priority" TEXT NOT NULL DEFAULT 'medium' CHECK ("priority" IN ('low', 'medium', 'high', 'critical')),
     "assignedTo" TEXT,
     "createdBy" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
